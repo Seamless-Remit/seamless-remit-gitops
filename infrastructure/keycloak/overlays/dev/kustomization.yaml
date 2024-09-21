@@ -10,6 +10,10 @@ commonLabels:
   environment: dev
 
 patches:
+  - path: keycloak-ingress-patch.yaml
+    target:
+      kind: Ingress
+      name: keycloak-ingress
   - target:
       kind: Deployment
       name: keycloak
@@ -47,5 +51,5 @@ images:
   - name: quay.io/keycloak/keycloak
     newTag: 24.0.1
   - name: mysql
-    newTag: 8.0
+    newTag: "8.0"
     

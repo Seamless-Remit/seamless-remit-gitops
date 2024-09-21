@@ -12,3 +12,4 @@ resources:
   - keycloack-mysql-pvc.yaml
   - keycloack-mysql-configmap.yaml
   - keycloack-keycloack-mysql-secrets.yaml
+  - keycloak-ingress.yaml
