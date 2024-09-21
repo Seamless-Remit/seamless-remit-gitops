@@ -1,0 +1,51 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+
+namePrefix: dev-
+
+commonLabels:
+  environment: dev
+
+patches:
+  - target:
+      kind: Deployment
+      name: keycloak
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+  - target:
+      kind: StatefulSet
+      name: keycloak-mysql
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+
+configMapGenerator:
+  - name: keycloak-realm-config
+    behavior: merge
+    literals:
+      - ENVIRONMENT=dev
+
+secretGenerator:
+  - name: keycloak-secrets
+    behavior: merge
+    literals:
+      - DB_PASSWORD=devpassword
+      - KEYCLOAK_ADMIN_PASSWORD=devadmin
+  - name: keycloak-mysql-secrets
+    behavior: merge
+    literals:
+      - MYSQL_PASSWORD=devmysqlpassword
+      - MYSQL_ROOT_PASSWORD=devmysqlroot
+
+images:
+  - name: quay.io/keycloak/keycloak
+    newTag: 24.0.1
+  - name: mysql
+    newTag: 8.0
+    
