@@ -1,17 +1,79 @@
-# Ingress Configuration
+---
+# Install Cert Manager
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cert-manager
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: cert-manager
+  namespace: cert-manager
+spec:
+  releaseName: cert-manager
+  chart:
+    repository: https://charts.jetstack.io
+    name: cert-manager
+    version: v1.8.0
+  values:
+    installCRDs: true
+
+---
+# ClusterIssuer for Let's Encrypt
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: your-email@example.com  # Replace with your email
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    solvers:
+    - http01:
+        ingress:
+          class: nginx
+
+---
+# Nginx Ingress Controller
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ingress-nginx
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: ingress-nginx
+  namespace: ingress-nginx
+spec:
+  releaseName: ingress-nginx
+  chart:
+    repository: https://kubernetes.github.io/ingress-nginx
+    name: ingress-nginx
+    version: 4.0.6
+  values:
+    controller:
+      publishService:
+        enabled: true
+
+---
+# Ingress for Argo CD
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: seamlessremit-ingress
+  name: argocd-ingress
+  namespace: argocd  # Assuming Argo CD is installed in the 'argocd' namespace
   annotations:
     kubernetes.io/ingress.class: nginx
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   tls:
   - hosts:
     - argocd.dev.seamlessremit.com
-    - keycloak.dev.seamlessremit.com
-    secretName: seamlessremit-tls
+    secretName: argocd-tls
   rules:
   - host: argocd.dev.seamlessremit.com
     http:
@@ -23,6 +85,23 @@ spec:
             name: argocd-server
             port: 
               number: 80
+
+---
+# Ingress for Keycloak
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: keycloak-ingress
+  namespace: keycloak  # Assuming Keycloak is installed in the 'keycloak' namespace
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  tls:
+  - hosts:
+    - keycloak.dev.seamlessremit.com
+    secretName: keycloak-tls
+  rules:
   - host: keycloak.dev.seamlessremit.com
     http:
       paths:
@@ -33,45 +112,3 @@ spec:
             name: keycloak
             port: 
               number: 8080
-
----
-# Service definitions (as before)
-apiVersion: v1
-kind: Service
-metadata:
-  name: argocd-server
-spec:
-  selector:
-    app: argocd-server
-  ports:
-    - port: 80
-      targetPort: 8080
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: keycloak
-spec:
-  selector:
-    app: keycloak
-  ports:
-    - port: 8080
-      targetPort: 8080
-
----
-# Cert-Manager ClusterIssuer for Let's Encrypt
-apiVersion: cert-manager.io/v1
-kind: ClusterIssuer
-metadata:
-  name: letsencrypt-prod
-spec:
-  acme:
-    server: https://acme-v02.api.letsencrypt.org/directory
-    email: jameszmapepa@gmail.com
-    privateKeySecretRef:
-      name: letsencrypt-prod
-    solvers:
-    - http01:
-        ingress:
-          class: nginx
