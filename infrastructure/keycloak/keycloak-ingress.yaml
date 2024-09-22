@@ -9,7 +9,7 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
 spec:
   rules:
-  - host: keycloak.example.com  # This will be overridden in overlays
+  - host: dev.seamlessremit.com  # This will be overridden in overlays
     http:
       paths:
       - path: /
