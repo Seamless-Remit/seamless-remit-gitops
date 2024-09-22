@@ -1,25 +1,4 @@
 ---
-# Install Cert Manager
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: cert-manager
----
-apiVersion: helm.fluxcd.io/v1
-kind: HelmRelease
-metadata:
-  name: cert-manager
-  namespace: cert-manager
-spec:
-  releaseName: cert-manager
-  chart:
-    repository: https://charts.jetstack.io
-    name: cert-manager
-    version: v1.8.0
-  values:
-    installCRDs: true
-
----
 # ClusterIssuer for Let's Encrypt
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
@@ -35,29 +14,6 @@ spec:
     - http01:
         ingress:
           class: nginx
-
----
-# Nginx Ingress Controller
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: ingress-nginx
----
-apiVersion: helm.fluxcd.io/v1
-kind: HelmRelease
-metadata:
-  name: ingress-nginx
-  namespace: ingress-nginx
-spec:
-  releaseName: ingress-nginx
-  chart:
-    repository: https://kubernetes.github.io/ingress-nginx
-    name: ingress-nginx
-    version: 4.0.6
-  values:
-    controller:
-      publishService:
-        enabled: true
 
 ---
 # Ingress for Argo CD
