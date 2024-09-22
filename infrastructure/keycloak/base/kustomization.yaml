@@ -6,7 +6,7 @@ resources:
   - keycloak-service.yaml
   - keycloak-secrets.yaml
   - keycloak-configmap.yaml
-  - keycloack-mysql-statefulset.yaml
+  - keycloak-mysql-statefulset.yaml
   - keycloak-mysql-service.yaml
   - keycloak-mysql-pv.yaml
   - keycloak-mysql-pvc.yaml
