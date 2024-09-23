@@ -1,0 +1,81 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: keycloak-realm-config
+data:
+  DB_VENDOR: "MYSQL"
+  DB_ADDR: "mysql"
+  DB_DATABASE: "keycloak"
+  DB_USER: "keycloak"
+  KEYCLOAK_ADMIN: "admin"
+  keycloak-realm-import.json: |-
+    {
+      "realm": "seamlessremit",
+      "enabled": true,
+      "sslRequired": "external",
+      "users": [
+        {
+          "username": "superuser",
+          "enabled": true,
+          "emailVerified": true,
+          "firstName": "Super",
+          "lastName": "User",
+          "email": "superuser@seamlessremit.com",
+          "credentials": [
+            {
+              "type": "password",
+              "value": "superuser123",
+              "temporary": false
+            }
+          ],
+          "realmRoles": ["admin", "user", "manager"],
+          "clientRoles": {
+            "account": ["manage-account", "view-profile"]
+          }
+        }
+      ],
+      "clients": [
+        {
+          "clientId": "seamlessremit-client",
+          "secret": "seamlessremit-client-secret",
+          "enabled": true,
+          "redirectUris": ["https://dev.seamlessremit.com/*"],
+          "baseUrl": "https://dev.seamlessremit.com",
+          "protocol": "openid-connect",
+          "publicClient": false,
+          "standardFlowEnabled": true,
+          "directAccessGrantsEnabled": true,
+          "fullScopeAllowed": true
+        }
+      ],
+      "roles": {
+        "realm": [
+          {
+            "name": "admin",
+            "description": "Administrator role"
+          },
+          {
+            "name": "user",
+            "description": "User role"
+          },
+          {
+            "name": "manager",
+            "description": "Manager role"
+          }
+        ],
+        "client": {
+          "seamlessremit-client": [
+            {
+              "name": "client-user",
+              "description": "Client user role"
+            }
+          ]
+        }
+      },
+      "groups": [
+        {
+          "name": "seamless-group",
+          "realmRoles": ["user"]
+        }
+      ]
+    }
