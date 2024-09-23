@@ -1,37 +1,14 @@
 ---
-# ClusterIssuer for Let's Encrypt
-apiVersion: cert-manager.io/v1
-kind: ClusterIssuer
-metadata:
-  name: letsencrypt-prod
-spec:
-  acme:
-    server: https://acme-v02.api.letsencrypt.org/directory
-    email: jameszmapepa@gmail.com  # Replace with your email
-    privateKeySecretRef:
-      name: letsencrypt-prod
-    solvers:
-    - http01:
-        ingress:
-          class: nginx
-
----
-# Ingress for Argo CD
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: argocd-ingress
-  namespace: argocd  # Assuming Argo CD is installed in the 'argocd' namespace
+  name: ingress-nginx
   annotations:
     kubernetes.io/ingress.class: nginx
-    cert-manager.io/cluster-issuer: letsencrypt-prod
+    cert-manager.io/cluster-issuer: "letsencrypt-staging"  # Change to "letsencrypt-prod" for production
 spec:
-  tls:
-  - hosts:
-    - argocd.dev.seamlessremit.com
-    secretName: argocd-tls
   rules:
-  - host: argocd.dev.seamlessremit.com
+  - host: argocd-dev.seamlessremit.com
     http:
       paths:
       - path: /
@@ -41,24 +18,7 @@ spec:
             name: argocd-server
             port: 
               number: 80
-
----
-# Ingress for Keycloak
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: keycloak-ingress
-  namespace: keycloak  # Assuming Keycloak is installed in the 'keycloak' namespace
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-spec:
-  tls:
-  - hosts:
-    - keycloak.dev.seamlessremit.com
-    secretName: keycloak-tls
-  rules:
-  - host: keycloak.dev.seamlessremit.com
+  - host: keycloak-dev.seamlessremit.com
     http:
       paths:
       - path: /
@@ -67,4 +27,59 @@ spec:
           service:
             name: keycloak
             port: 
-              number: 8080
+              number: 80
+
+---
+# Cert-Manager Installation
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cert-manager
+
+---
+apiVersion: helm.fluxcd.io/v1
+kind: HelmRelease
+metadata:
+  name: cert-manager
+  namespace: cert-manager
+spec:
+  releaseName: cert-manager
+  chart:
+    repository: https://charts.jetstack.io
+    name: cert-manager
+    version: v1.8.0  # Check for the latest version
+  values:
+    installCRDs: true
+
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: jameszmapepa@gmail.com  # Replace with your email
+    privateKeySecretRef:
+      name: letsencrypt-staging
+    solvers:
+    - http01:
+        ingress:
+          class: nginx
+
+# For production, uncomment and modify the following:
+# ---
+# apiVersion: cert-manager.io/v1
+# kind: ClusterIssuer
+# metadata:
+#   name: letsencrypt-prod
+# spec:
+#   acme:
+#     server: https://acme-v02.api.letsencrypt.org/directory
+#     email: your-email@example.com  # Replace with your email
+#     privateKeySecretRef:
+#       name: letsencrypt-prod
+#     solvers:
+#     - http01:
+#         ingress:
+#           class: nginx
