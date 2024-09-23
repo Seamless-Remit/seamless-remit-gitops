@@ -5,7 +5,9 @@ metadata:
   namespace: keycloak
   annotations:
     kubernetes.io/ingress.class: nginx
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"  # Assumes you have cert-manager set up
+    cert-manager.io/cluster-issuer: "letsencrypt-prod" 
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
 spec:
   tls:
   - hosts:
@@ -19,6 +21,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: keycloak  # Replace with your actual Keycloak service name
+            name: keycloak  
             port: 
-              number: 8080  # Replace with your actual Keycloak service port
+              number: 8080 
