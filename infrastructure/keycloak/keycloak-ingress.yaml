@@ -10,8 +10,8 @@ spec:
   - host: dev.seamlessremit.com
     http:
       paths:
-      - path: /keycloak(/|$)(.*)
-        pathType: ImplementationSpecific
+      - path: /keycloak
+        pathType: Prefix
         backend:
           service:
             name: keycloak
