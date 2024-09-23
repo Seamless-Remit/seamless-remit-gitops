@@ -2,7 +2,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: keycloak-tls-cert
-  namespace: keycloak  # Replace with your Keycloak namespace if different
+  namespace: keycloak
 spec:
   secretName: keycloak-tls-secret
   issuerRef:
@@ -11,3 +11,5 @@ spec:
   commonName: keycloak-dev.seamlessremit.com
   dnsNames:
   - keycloak-dev.seamlessremit.com
+  duration: 2160h # 90 days
+  renewBefore: 360h # 15 days
