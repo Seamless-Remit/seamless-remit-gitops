@@ -1,40 +1,22 @@
----
-apiVersion: cert-manager.io/v1
-kind: ClusterIssuer
-metadata:
-  name: letsencrypt-prod
-spec:
-  acme:
-    server: https://acme-v02.api.letsencrypt.org/directory
-    email: jameszmapepa@gmail.com
-    privateKeySecretRef:
-      name: letsencrypt-prod
-    solvers:
-    - http01:
-        ingress:
-          class: nginx
-
----
-apiVersion: v1
-kind: Namespace
+apiVersion: argoproj.io/v1alpha1
+kind: Application
 metadata:
   name: cert-manager
-
----
-apiVersion: helm.fluxcd.io/v1
-kind: HelmRelease
-metadata:
-  name: cert-manager
-  namespace: cert-manager
+  namespace: argocd
 spec:
-  releaseName: cert-manager
-  chart:
-    repository: https://charts.jetstack.io
-    name: cert-manager
-    version: v1.8.0
-  values:
-    installCRDs: true
-    prometheus:
-      enabled: false
-    extraArgs:
-      - --dns01-recursive-nameservers=8.8.8.8:53,1.1.1.1:53
+  project: default
+  source:
+    repoURL: https://charts.jetstack.io
+    chart: cert-manager
+    targetRevision: v1.12.0 # Replace with the desired version
+    helm:
+      parameters:
+        - name: installCRDs
+          value: "true"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cert-manager
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
