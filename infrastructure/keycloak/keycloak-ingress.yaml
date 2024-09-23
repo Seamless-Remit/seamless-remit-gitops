@@ -6,14 +6,13 @@ metadata:
   annotations:
         kubernetes.io/ingress.class: nginx
         nginx.ingress.kubernetes.io/use-regex: "true"  # Enable regex for flexible path matching
-
 spec:
   ingressClassName: nginx
   rules:
-  - host: keycloak-dev.seamlessremit.com
+  - host: seamlessremit.com
     http:
       paths:
-      - path: /(.*)
+      - path: /keycloak(/|$)(.*)
         pathType: ImplementationSpecific
         backend:
           service:
