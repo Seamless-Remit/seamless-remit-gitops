@@ -51,10 +51,7 @@ spec:
                   key: DB_PASSWORD
                   name: keycloak-secrets
             - name: KEYCLOAK_ADMIN
-              valueFrom:
-                configMapKeyRef:
-                  key: KEYCLOAK_ADMIN
-                  name: keycloak-realm-config
+              value: "admin"
             - name: KEYCLOAK_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
