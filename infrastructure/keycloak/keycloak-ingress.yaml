@@ -7,7 +7,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: keycloak-dev.seamlessremit.com
+  - host: seamlessremit.com
     http:
       paths:
       - path: /keycloak(/|$)(.*)
