@@ -4,7 +4,7 @@ metadata:
   name: argocd-cm
 data:
   url: https://argocd-dev.seamlessremit.com
-  oidc.config: |
+  dex.config: |
     name: Keycloak
     issuer: https://keycloak-dev.seamlessremit.com/realms/seamlessremit
     clientID: argocd
