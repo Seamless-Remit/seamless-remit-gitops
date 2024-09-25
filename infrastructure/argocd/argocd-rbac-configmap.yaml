@@ -5,4 +5,4 @@ metadata:
 data:
   policy.csv: |
     g, ArgoCDAdmins, role:admin
-    scopes: '[groups]'
+  scopes: '[groups]'
